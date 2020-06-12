@@ -21,7 +21,7 @@ TARGET = 30
 BREAKS = 2
 FILENAME = "SSTPA/modules/params/Datos.xlsx"
 TIMELIMIT = (100) * 60 * 60
-MODEL = "V3" # {V3, V4}
+MODEL = "V4" # {V3, V4}
 
 
 # Carga de Datos
