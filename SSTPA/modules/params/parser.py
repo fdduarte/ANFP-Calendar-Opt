@@ -33,6 +33,16 @@ class ChampStats:
       winner = "D"
     return home, away, winner
 
+  @staticmethod
+  def get_team_points_in_match(match, team):
+    if match['winner'] == 'D':
+      return 1
+    if match['winner'] == 'H' and match['home'] == team:
+      return 3
+    if match['winner'] == 'A' and match['away'] == team:
+      return 3
+    return 0
+
   def _load_team_stats_in_dates(self):
     """
     :return: {team -> {wins: i, draws: j, loses: k}}
@@ -132,6 +142,20 @@ class ChampStats:
       _, _, alias, fr_points, home_left = line
       teams[alias] = {"fr_points": int(fr_points), "home_left": int(home_left)}
     return teams
+
+  def get_team_match_by_date(self, team, date):
+    for match in self.matches.values():
+      if match['date'] == date and team in [match['away'], match['home']]:
+        return match
+
+  def get_team_result_pattern(self, team, dates):
+    pat = ""
+    points_to_char = {0: 'L', 1: 'D', 3: 'W'}
+    for date in dates:
+      match = self.get_team_match_by_date(team, date)
+      points = self.get_team_points_in_match(match, team)
+      pat += points_to_char[points]
+    return pat
 
 
   def load(self):

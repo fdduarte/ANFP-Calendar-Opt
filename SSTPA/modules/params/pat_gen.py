@@ -29,8 +29,11 @@ def check_homeaway_pattern(team, home_match, full_patterns, teams, start_date, b
   :return: Conjunto de patrones que son posibles para
   el equipo
   """
+  team_pat = ""
+  for date in range(16, 31):
+    team_pat += str(home_match[team][date])
   if start_date == 16:
-    correct_pat = list()
+    correct_pat = [team_pat] # Se agrega sol inicial como primer patrón
     for pattern in full_patterns:
       # Se revisa si el patrón calza con las localias y visitas faltantes.
       cond1 = pattern.count("1") == teams[team]['home_left']
@@ -75,6 +78,7 @@ def check_homeaway_pattern(team, home_match, full_patterns, teams, start_date, b
   for pattern in correct_pat2:
     if pattern.count("1") == teams[team]['home_left']:
       correct_pat1.append(pattern)
+  correct_pat1.insert(0, team_pat) # Se inserta patron del equipo en el inicio
   return correct_pat1
 
 def check_results_pattern(teams_stats, patterns):
@@ -117,14 +121,6 @@ def results_patterns_gen(filename, teams_stats, start_date, end_date): # estanda
 def result_patterns_gen_v4(length):
   return ["".join(seq) for seq in itertools.product("WDL", repeat=length)]
 
-def check_short_result_pattern(pattern, teams_stats, team):
-  """
-  Chequea si un patrón corto (G1 o G2) es válido para un equipo.
-  Para esto, revisa que no tenga mas victorias y mas derrotas que el equipo.
-  """
-  if pattern.count("D") <= teams_stats[team]['draws'] and pattern.count("W") <= teams_stats[team]['wins']:
-    return 1
-  return 0
 
 def home_away_patterns(breaks):
   return filter(homeaway_filter(breaks), ["".join(seq) for seq in itertools.product("01", repeat=15)])

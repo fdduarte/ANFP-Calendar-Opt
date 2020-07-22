@@ -4,7 +4,7 @@ from gurobipy import Model, GRB, quicksum
 import time
 sys.path.append(os.path.abspath(os.path.join('..', 'ANFP-Calendar-Opt', 'SSTPA')))
 
-from modules.params.params import N, F, S, I, T, G, R, EL, EV, L, RP, E, EB, V, H, TIMELIMIT, START_TIME, stats, S_full
+from modules.params.params import N, F, S, I, T, G, R, EL, EV, L, RP, E, EB, V, H, TIMELIMIT, START_TIME, stats, S_full, Xi, Pi, Ai, Di
 from modules.model_stats import ModelStats
 
 m = Model("SSTPA V3")
@@ -26,36 +26,59 @@ start_model = time.time()
 # en la fecha f
 # 0 en otro caso.
 x = m.addVars(N, F, vtype=GRB.BINARY, name="x")
+for n in N:
+  for f in F:
+    x[n, f].start = Xi[n][f]
 
 # y_is: y[equipo][patron_localias]
 # 1 si al equipo i se le asigna el patron
 # de localias s
 # 0 en otro caso
 y = {i: m.addVars(S[i], vtype=GRB.BINARY, name="y") for i in I}
+for i in I:
+  y[i][S[i][0]].start = 1 # Patrón 0 es el patron correspondiente al equipo
+  for s in range(1, len(S[i])):
+    y[i][S[i][s]].start = 0
+
+
 
 # p_itf: P[equipo, puntos, fecha]
 # 1 si el equipo i tiene t puntos al
 # finalizar la fecha f.
 # 0 en otro caso.
 p = m.addVars(I, T, F, vtype=GRB.BINARY, name="p")
+for i in I:
+  for t in T:
+    for f in F:
+      p[i, t, f].start = Pi[i][t][f]
 
 # z_ig: z[equipo][patron_resultados]
 # 1 si al equipo i se le asigna el patron
 # de resultados g.
 # 0 en otro caso.
 z = {i: m.addVars(G[i], vtype=GRB.BINARY, name="z") for i in I}
+for i in I:
+  z[i][G[i][0]].start = 1 # Patrón 0 es el patron correspondiente al equipo
+  for g in range(1, len(G[i])):
+    z[i][G[i][g]].start = 0
 
 # a_if: a[equipo, fecha]
 # 1 si el partido del equipo i en la fecha f
 # es atractivo por salir campeon.
 # 0 en otro caso.
 a = m.addVars(I, F, vtype=GRB.BINARY, name="a")
+for i in I:
+  for f in F:
+    a[i, f].start = Ai[i][f]
 
 # d_if: d[equipo, fecha]
 # 1 si el partido del equipo i en la fecha f
 # es atractivo por poder descender.
 # 0 en otro caso.
 d = m.addVars(I, F, vtype=GRB.BINARY, name="d")
+for i in I:
+  for f in F:
+    d[i, f].start = Di[i][f]
 
 print(f"** VARIABLES TIME: {time.time() - start_model}")
 
@@ -154,5 +177,3 @@ print(f"** TOTAL TIME: {time.time() - START_TIME}")
 
 ModelStats.parse_gurobi_output(m.getVars(), stats.matches, S_full)
 ModelStats.check_valid_output()
-
-

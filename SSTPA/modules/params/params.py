@@ -2,7 +2,7 @@ import sys, os
 import pandas as pd
 import time
 import sys
-from modules.params.pat_gen import home_away_patterns, check_homeaway_pattern, results_patterns_gen, check_results_pattern, result_patterns_gen_v4, check_short_result_pattern, patterns_sample
+from modules.params.pat_gen import home_away_patterns, check_homeaway_pattern, results_patterns_gen, check_results_pattern, result_patterns_gen_v4, patterns_sample
 from modules.params.parser import ChampStats
 
 
@@ -51,10 +51,12 @@ full_homeaway_patterns = list(home_away_patterns(BREAKS)).copy()
 patterns = list(set([pat[FECHAINI - 16:FECHAFIN - 15] for pat in full_homeaway_patterns]))
 patterns = {i + 1: patterns[i] for i in range(len(patterns))}
 
-S_full = dict()
+S_full = dict() # Diccionario cuyo valor es el patrón
 for i in I:
   pat = check_homeaway_pattern(i, stats.team_home_away, full_homeaway_patterns, stats.teams, FECHAINI, BREAKS)
+  orig_pat = pat.pop(0)
   pat = list(set([p[FECHAINI - 16:FECHAFIN - 15] for p in pat]))
+  pat.insert(0, orig_pat[FECHAINI - 16:FECHAFIN - 15])
   S_full[i] = {f"{i}-{j + 1}": pat[j] for j in range(len(pat))}
 S = {i: list(S_full[i].keys()) for i in I}
 
@@ -70,6 +72,7 @@ G_full = dict()
 for i in I:
   pat = list(set([pat for pat in team_patterns[i]]))
   patterns_sample(pat, THRESHOLD, FILTER)
+  pat.insert(0, stats.get_team_result_pattern(i, F))
   G_full[i] = {f"{i}-{j + 1}": pat[j] for j in range(len(pat))} # Contiene el valor asociado a la llave patron de Gi
 G = {i: list(G_full[i].keys()) for i in I}
 
@@ -168,13 +171,72 @@ V = {f: 0  if f - 15 <= TARGET else f - 15 for f in F}
 
 print("FINISHED LOADING PARAMS")
 
+###################
+#*  SOL INICIAL  *#
+###################
 
-      
+# x_nf: x[partido, fecha]
+# 1 si el partido n se programa finalmente
+# en la fecha f
+# 0 en otro caso.
+Xi = {n: {f: 0 for f in F} for n in N}
+for n in N:
+  Xi[n][stats.matches[n]['date']] = 1
 
 
+# p_itf: P[equipo, puntos, fecha]
+# 1 si el equipo i tiene t puntos al
+# finalizar la fecha f.
+# 0 en otro caso.
+Pi = {i: {t: {f: 0 for f in F} for t in T} for i in I}
+for i in I:
+  team_points = E[i]
+  for f in F:
+    match = stats.get_team_match_by_date(i, f)
+    points = stats.get_team_points_in_match(match, i)
+    team_points += points
+    Pi[i][team_points][f] = 1
 
+# pe_if: P[equipo, fecha]
+# puntos del equipo i en la fecha f
+PE = {i: {f: 0 for f in F} for i in I}
+for i in I:
+  team_points = E[i]
+  for f in F:
+    match = stats.get_team_match_by_date(i, f)
+    points = stats.get_team_points_in_match(match, i)
+    team_points += points
+    PE[i][f] = team_points
 
+# MAX_f: MAX[fecha]; MIN_f: MIN[fecha]
+# Cantidad maxima/minima de puntos de los equipos para la fecha f
+MAX = {f: 0 for f in F}
+MIN = {f: 1000000 for f in F}
+for f in F:
+  for i in I:
+    if PE[i][f] > MAX[f]:
+      MAX[f] = PE[i][f]
+    if PE[i][f] < MIN[f]:
+      MIN[f] = PE[i][f]
 
+# a_if: a[equipo, fecha]
+# 1 si el partido del equipo i en la fecha f
+# es atractivo por salir campeon.
+# 0 en otro caso.
+Ai = {i: {f: 0 for f in F} for i in I}
 
+# d_if: d[equipo, fecha]
+# 1 si el partido del equipo i en la fecha f
+# es atractivo por poder descender.
+# 0 en otro caso.
+Di = {i: {f: 0 for f in F} for i in I}
+
+for f in F:
+  dates_left = FECHAFIN - f
+  for i in I:
+    if PE[i][f] + 3 * dates_left >= MAX[f]: # Puede salir campeon
+      Ai[i][f] = 1
+    if MIN[f] + 3 * dates_left >= PE[i][f]: # Puede descender
+      Di[i][f] = 1
 
 
