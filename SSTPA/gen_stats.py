@@ -1,9 +1,9 @@
 from modules.model_stats import ModelStats
 
 
-LOGS = [f"{i}-30" for i in range(18, 24)]
-PATH = "SSTPA/logs/13-6"
-NAME = "V3-t"
+LOGS = [f"{i}-30" for i in range(18, 25)]
+PATH = "SSTPA/logs/logs_1"
+NAME = "V3-initial-sol"
 
 plotter = ModelStats(PATH, NAME)
 plotter.parse_logs(LOGS)
