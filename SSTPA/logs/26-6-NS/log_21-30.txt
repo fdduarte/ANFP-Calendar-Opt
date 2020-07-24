@@ -1,3 +1,0 @@
-PARAMS:
-Fechas: 21-30
-TARGET: 15

@@ -1,0 +1,41 @@
+PARAMS:
+Fechas: 21-30
+TARGET: 5
+FILTER: 0.2 (thrs 100)
+BREAKS: 1
+FINISHED LOADING PARAMS
+Using license file /Users/fernandoduarte/gurobi.lic
+Academic license - for non-commercial use only
+Changed value of parameter TimeLimit to 360000.0
+   Prev: inf  Min: 0.0  Max: inf  Default: inf
+Changed value of parameter MIPFocus to 1
+   Prev: 0  Min: 0  Max: 3  Default: 0
+Changed value of parameter MIPGap to 0.3
+   Prev: 0.0001  Min: 0.0  Max: inf  Default: 0.0001
+** VARIABLES TIME: 0.23606586456298828
+** RESTRICTIONS TIME: 18.30479884147644
+Gurobi Optimizer version 9.0.1 build v9.0.1rc0 (mac64)
+Optimize a model with 298800 rows, 39517 columns and 12221594 nonzeros
+Model fingerprint: 0xa41339de
+Variable types: 0 continuous, 39517 integer (39517 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 3e+00]
+  Objective range  [6e+00, 2e+01]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 2e+00]
+
+Loaded user MIP start with objective 1316
+
+Presolve removed 296654 rows and 39417 columns (presolve time = 6s) ...
+Presolve removed 298800 rows and 39517 columns
+Presolve time: 6.46s
+Presolve: All rows and columns removed
+
+Explored 0 nodes (0 simplex iterations) in 6.65 seconds
+Thread count was 1 (of 8 available processors)
+
+Solution count 2: 1628 
+
+Optimal solution found (tolerance 3.00e-01)
+Best objective 1.628000000000e+03, best bound 1.628000000000e+03, gap 0.0000%
+** TOTAL TIME: 26.598716735839844
