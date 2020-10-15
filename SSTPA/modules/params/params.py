@@ -84,9 +84,12 @@ T = list(range(min_points, max_points + 1))
 ############################
 
 # Ei: E[equipo]
+# PIi: PI[equipo]
 # cantidad de puntos del equipo i la fecha anterior a la primera
 # de las fechas que quedan por jugar
 E = {i: stats.team_points[i] for i in I}
+
+PI = {i: stats.team_points[i] for i in I}
 
 # EBit: EB[equipo][puntos]
 # 1 si equipo i tiene t puntos la fecha anterior a la primera
