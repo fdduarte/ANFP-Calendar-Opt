@@ -125,7 +125,6 @@ alfa_m = m.addVars(I,I,F, vtype=GRB.BINARY, name="alfa_m")
 # resultados futuros para el equipo i considerando que
 # se está en la fecha l
 alfa_p = m.addVars(I,I,F, vtype=GRB.BINARY, name="alfa_p")
-M = m.addVar(vtype=GRB.INTEGER, name="M")
 
 #beta_il: beta[equipo,fecha]
 #discreta, indica la mejor posicion
@@ -140,6 +139,8 @@ beta_m = m.addVars(I,F, vtype=GRB.INTEGER, name="beta_m")
 #torneo, mirando desde la fecha l en el PEOR
 #conjunto de resultados futuros para el equipo i
 beta_p = m.addVars(I,F, vtype=GRB.INTEGER, name="beta_p")
+
+#M = m.addVar(vtype=GRB.INTEGER, name="M")
 
 
 
@@ -189,10 +190,10 @@ m.addConstrs((x[n,f] == (v_p[n,i,l,f] + e_p[n,i,l,f] + a_p[n,i,l,f])
                                                                   for l in F
                                                                   if  f > l),name="R9")
 
-
+#print(" N:" + str(len(N)) + "   I:" + str(len(I)) + "   F:" + str(len(F)))
 # R10
 #m.addConstrs((quicksum(x[n, f] * R[i][n] for n in N if EL[i][n] + EV[i][n]  == 1) == quicksum(z[i][g] * RP[g][f] for g in G[i]) for i in I for f in F), name="R10")
-m.addConstrs(((p_m[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n][theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta <= l) + quicksum(quicksum(3 * v_m[n,i,l,f] for l in F if l <= f) for n in N if EL[j][n] == 1) + quicksum(quicksum(3 * a_m[n,i,l,f] for l in F if l < f) for n in N if EV[j][n] == 1) + quicksum(quicksum(e_m[n,i,l,f] for l in F if l < f) for n in N if EL[j][n] + EV[j][n] == 1)) for n in N for j in I for i in I for f in F for l in F), name="R10")
+#m.addConstrs(((p_m[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n][theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta <= l) + quicksum(quicksum(3 * v_m[n,i,l,f] for l in F if l <= f) for n in N if EL[j][n] == 1) + quicksum(quicksum(3 * a_m[n,i,l,f] for l in F if l < f) for n in N if EV[j][n] == 1) + quicksum(quicksum(e_m[n,i,l,f] for l in F if l < f) for n in N if EL[j][n] + EV[j][n] == 1)) for n in N for j in I for i in I for f in F for l in F), name="R10")
 
 
 
@@ -200,7 +201,7 @@ m.addConstrs(((p_m[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n][theta] f
 #m.addConstrs( (p[i, t, f] == quicksum(z[i][g] for g in H[i][f][t]) for f in F
 #                                                                   for t in T
 #                                                                   for i in I), name="R11")
-m.addConstrs((p_p[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n][theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta <= l) + quicksum(quicksum(3 * v_p[n,i,l,f] for l in F if l <= f) for n in N if EL[j][n] == 1) + quicksum(quicksum(3 * a_p[n,i,l,f] for l in F if l < f) for n in N if EV[j][n] == 1) + quicksum(quicksum(e_p[n,i,l,f] for l in F if l < f) for n in N if EL[j][n] + EV[j][n] == 1) for n in N for j in I for i in I for f in F for l in F), name="R11")
+#m.addConstrs((p_p[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n][theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta <= l) + quicksum(quicksum(3 * v_p[n,i,l,f] for l in F if l <= f) for n in N if EL[j][n] == 1) + quicksum(quicksum(3 * a_p[n,i,l,f] for l in F if l < f) for n in N if EV[j][n] == 1) + quicksum(quicksum(e_p[n,i,l,f] for l in F if l < f) for n in N if EL[j][n] + EV[j][n] == 1) for n in N for j in I for i in I for f in F for l in F), name="R11")
 
 
 # R12
@@ -209,10 +210,14 @@ m.addConstrs((p_p[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n][theta] fo
 #                                                                                                           for t in T
 #                                                                                                           for f in F
 #                                                                                                           if f > F[0] and j != i), name="R12")
-M=10000
-m.addConstrs(((M * (1 - alfa_m[i, j, l] >= p_m[j, i, l, F] - p_m[i, i, l, F])) for i in I
+
+#m.addConstr(GRB.LinExpr(M) > 200, name = "R16")
+
+m.addConstrs((((1000 - 1000 * alfa_m[i, j, l] >= p_m[j, i, l, f] - p_m[i, i, l, f])) for i in I
                                                                           for j in I
-                                                                          for l in F), name="R12")
+                                                                          for l in F
+                                                                          for f in F
+                                                                          if f > l), name="R12")
 # M es un número grande que hay que reemplazar
 
 
@@ -221,14 +226,16 @@ m.addConstrs(((M * (1 - alfa_m[i, j, l] >= p_m[j, i, l, F] - p_m[i, i, l, F])) f
 #                                                                                                     for j in I
 #                                                                                                     for t in T
 #                                                                                                     if j != i), name="R13")
-m.addConstrs((((M * (alfa_p[i, j, l]) >= p_p[i, i, l, F] - p_p[j, i, l, F])) for i in I
+m.addConstrs((((1000 * (alfa_p[i, j, l]) >= p_p[i, i, l, f] - p_p[j, i, l, f])) for i in I
                                                                            for j in I
-                                                                           for l in F), name="R13")
+                                                                           for l in F
+                                                                           for f in F
+                                                                           if f > l), name="R13")
 # M es un número grande que hay que reemplazar
 
 #R14
 for i in I:
-  m.addConstrs(((beta_m[i,l]==len(I)-(quicksum(alfa_m[i,j,l] for i,j in I if i!=j))) for l in F),name="R14")
+  m.addConstrs(((beta_m[i,l]==len(I)-(quicksum(alfa_m[i,j,l] for i in I for j in I if i!=j))) for l in F),name="R14")
 
 
 # R15
@@ -236,7 +243,7 @@ for i in I:
 #                                     for f in F
 #                                     if f > F[0]), name="R15")
 for i in I:
-  m.addConstrs(((beta_p[i,l]==len(I)-(quicksum(alfa_p[i,j,l] for i,j in I if i!=j))) for l in F),name="R15")
+  m.addConstrs(((beta_p[i,l]==len(I)-(quicksum(alfa_p[i,j,l] for i in I for j in I if i!=j))) for l in F),name="R15")
 
 
 # R16
@@ -270,7 +277,7 @@ print(f"** RESTRICTIONS TIME: {time.time() - start_model}")
 
 #m.setObjective(quicksum(quicksum(V[f] * (a[i, f] + d[i, f]) for i in I) for f in F), GRB.MAXIMIZE)
 
-m.setObjective(quicksum(quicksum(beta_m[f,i] - beta_p[f,i] for i in I) for f in F), GRB.MAXIMIZE)
+m.setObjective(quicksum(quicksum(beta_m[i,f] - beta_p[i,f] for i in I) for f in F), GRB.MAXIMIZE)
 
 m.optimize()
 
