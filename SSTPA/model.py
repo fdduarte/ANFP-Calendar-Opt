@@ -125,6 +125,7 @@ alfa_m = m.addVars(I,I,F, vtype=GRB.BINARY, name="alfa_m")
 # resultados futuros para el equipo i considerando que
 # se está en la fecha l
 alfa_p = m.addVars(I,I,F, vtype=GRB.BINARY, name="alfa_p")
+M = m.addVar(vtype=GRB.INTEGER, name="M")
 
 #beta_il: beta[equipo,fecha]
 #discreta, indica la mejor posicion
