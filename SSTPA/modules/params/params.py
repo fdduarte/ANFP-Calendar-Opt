@@ -25,7 +25,7 @@ if (len(sys.argv)) == 3:
 THRESHOLD = 100
 FILTER = 0.25
 TARGET = 10
-BREAKS = 1
+BREAKS = 2
 FILENAME = "SSTPA/modules/params/Datos.xlsx"
 TIMELIMIT = (10000) * 60 * 60
 print(f"PARAMS:\nFechas: {FECHAINI}-{FECHAFIN}\nTARGET: {TARGET}\nFILTER: {FILTER} (thrs {THRESHOLD})\nBREAKS: {BREAKS}")
@@ -83,12 +83,12 @@ T = list(range(min_points, max_points + 1))
 #* PARAMETROS DEL MODELO *#
 ############################
 
-# Ei: E[equipo]
+# M
+M = 10**4
+
 # PIi: PI[equipo]
 # cantidad de puntos del equipo i la fecha anterior a la primera
 # de las fechas que quedan por jugar
-E = {i: stats.team_points[i] for i in I}
-
 PI = {i: stats.team_points[i] for i in I}
 
 # EBit: EB[equipo][puntos]
@@ -155,7 +155,7 @@ for i in I:
 # Patrones tales que el equipo i tiene
 # t puntos en la fecha f
 H = dict()
-puntos = lambda i, f, g: E[i] + sum([RP[g][l] for l in range(F[0], f + 1)])
+puntos = lambda i, f, g: PI[i] + sum([RP[g][l] for l in range(F[0], f + 1)])
 for i in I:
   H[i] = dict()
   for f in F:

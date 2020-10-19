@@ -1,1 +1,21 @@
-Modelo Infactible
+jornada, local, visita
+6,,
+,B,A
+,C,F
+,D,E
+7,,
+,F,A
+,E,C
+,D,B
+8,,
+,F,E
+,A,D
+,C,B
+9,,
+,D,C
+,E,A
+,B,F
+10,,
+,E,B
+,F,D
+,A,C
