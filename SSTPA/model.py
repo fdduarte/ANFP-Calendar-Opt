@@ -163,7 +163,7 @@ m.addConstrs((x[n,f] == (v_p[n,i,l,f] + e_p[n,i,l,f] + a_p[n,i,l,f])
                                                                   if  f > l),name="R9")
 
 # R10
-m.addConstrs(((p_m[j,i,l,f] == PI[i] + quicksum(quicksum(R[i][n] * x[n,theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta <= l)
+m.addConstrs(((p_m[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n,theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta > 5 and theta <= l)
            + quicksum(quicksum(3 * v_m[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] == 1) 
            + quicksum(quicksum(3 * a_m[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EV[j][n] == 1) 
            + quicksum(quicksum(e_m[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] + EV[j][n] == 1)) 
@@ -173,7 +173,7 @@ m.addConstrs(((p_m[j,i,l,f] == PI[i] + quicksum(quicksum(R[i][n] * x[n,theta] fo
                         for l in F), name="R10")
 
 # R11
-m.addConstrs(((p_p[j,i,l,f] == PI[i] + quicksum(quicksum(R[i][n] * x[n,theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta <= l)
+m.addConstrs(((p_p[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n,theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta > 5 and theta <= l)
            + quicksum(quicksum(3 * v_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] == 1) 
            + quicksum(quicksum(3 * a_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EV[j][n] == 1) 
            + quicksum(quicksum(e_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] + EV[j][n] == 1)) 
@@ -188,19 +188,19 @@ m.addConstrs((((M - M * alfa_m[i, j, l] >= p_m[j, i, l, F[-1]] - p_m[i, i, l, F[
                                                                           for j in I
                                                                           for l in F), name="R12")
 
-# R13                                                                                        if j != i), name="R13")
+# R13                                                                                        
 m.addConstrs((((M * (alfa_p[i, j, l]) >= p_p[i, i, l, F[-1]] - p_p[j, i, l, F[-1]])) for i in I
                                                                            for j in I
                                                                            for l in F), name="R13")
 
 #R14
 for i in I:
-  m.addConstrs(((beta_m[i,l]==len(I)-(quicksum(alfa_m[i,j,l] for i in I for j in I if i!=j))) for l in F),name="R14")
+  m.addConstrs(((beta_m[i,l]==len(I)-(quicksum(alfa_m[i,j,l] for j in I if i!=j))) for l in F),name="R14")
 
 
 # R15
 for i in I:
-  m.addConstrs(((beta_p[i,l]==len(I)-(quicksum(alfa_p[i,j,l] for i in I for j in I if i!=j))) for l in F),name="R15")
+  m.addConstrs(((beta_p[i,l]==len(I)-(quicksum(alfa_p[i,j,l] for j in I if i!=j))) for l in F),name="R15")
 
 print(f"** RESTRICTIONS TIME: {time.time() - start_model}")
 
@@ -219,3 +219,5 @@ print(f"** TOTAL TIME: {time.time() - START_TIME}")
 ModelStats.parse_gurobi_output(m.getVars(), stats.matches, S_full)
 ModelStats.check_valid_output()
 
+for i in I:
+  print(PI[i])
