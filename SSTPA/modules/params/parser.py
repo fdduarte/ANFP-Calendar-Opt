@@ -68,8 +68,8 @@ class ChampStats:
     Función que, del archivo en el formato especificado retorna un
     diccionario con las caracteristicas del partido.
     """
-    matches = {i: [] for i in range(1, 241)}
-    match = 240
+    matches = {i: [] for i in range(1, 31)}
+    match = 30
     for line in self.match_file:
       if line[0] != "nan":
         date = int(float(line[0]))

@@ -12,7 +12,7 @@ def homeaway_filter(breaks):
     """
     local = string.count("0")
     visit = string.count("1")
-    if local < 7 or visit < 7:
+    if local < 2 or visit < 2:
       return False
     if "111" in string or "000" in string:
       return False
@@ -29,20 +29,20 @@ def check_homeaway_pattern(team, home_match, full_patterns, teams, start_date, b
   :return: Conjunto de patrones que son posibles para
   el equipo
   """
-  if start_date == 16:
+  if start_date == 6:
     correct_pat = list()
     for pattern in full_patterns:
       # Se revisa si el patrón calza con las localias y visitas faltantes.
       cond1 = pattern.count("1") == teams[team]['home_left']
       # Revisa ultimas fechas de primera rueda para evitar tres partidos L o V.
-      if home_match[team][14] and home_match[team][15]:
+      if home_match[team][4] and home_match[team][5]:
         cond2 = pattern[0] == "0"
-      elif not home_match[team][14] and not home_match[team][15]:
+      elif not home_match[team][4] and not home_match[team][5]:
         cond2 = pattern[0] == "1"
       # Además, revisa si se lleva un break de la primera rueda.
-      elif home_match[team][15] and pattern[0] == 1:
+      elif home_match[team][5] and pattern[0] == 1:
         cond2 = pattern.count("11") <= breaks - 1
-      elif not home_match[team][15] and pattern[0] == 0:
+      elif not home_match[team][5] and pattern[0] == 0:
         cond2 = pattern.count("00") <= breaks - 1
       else:
         cond2 = True
@@ -54,18 +54,18 @@ def check_homeaway_pattern(team, home_match, full_patterns, teams, start_date, b
   pattern_start = ""
   # Genera un string con las fechas ya jugadas. Luego, se revisa si
   # El comienzo del patron calza con el string generado.
-  for date in range(16, start_date):
+  for date in range(6, start_date):
     pattern_start += str(home_match[team][date])
   for pattern in full_patterns:
-    if pattern[:start_date - 16] == pattern_start:
+    if pattern[:start_date - 6] == pattern_start:
       correct_pat1.append(pattern)
   correct_pat2 = list()
   # Se revisa si se llevo un break de rueda pasada.
   for pattern in correct_pat1:
-    if home_match[team][15] == "1" and pattern[0] == "1":
+    if home_match[team][5] == "1" and pattern[0] == "1":
       if pattern.count("11") <= breaks - 1:
         correct_pat2.append(pattern)
-    elif not home_match[team][15] == "0" and pattern[0] == "0":
+    elif not home_match[team][5] == "0" and pattern[0] == "0":
       if pattern.count("00") <= breaks - 1:
         correct_pat2.append(pattern)
     else:
@@ -127,7 +127,7 @@ def check_short_result_pattern(pattern, teams_stats, team):
   return 0
 
 def home_away_patterns(breaks):
-  return filter(homeaway_filter(breaks), ["".join(seq) for seq in itertools.product("01", repeat=15)])
+  return filter(homeaway_filter(breaks), ["".join(seq) for seq in itertools.product("01", repeat=5)])
 
 def patterns_sample(patterns, threshold, relative_size, seed=1):
   """

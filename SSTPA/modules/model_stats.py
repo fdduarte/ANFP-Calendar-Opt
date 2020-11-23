@@ -56,6 +56,9 @@ class ModelStats:
     file_lines = dict()
     try:
       for var in model_vars:
+        if "p_m" in str(var):
+          if (str(var)[20:21] != "10") and ((str(var)[20] < str(var)[22]) or (str(var)[22] == "1")):
+            print(var)
         if "x" in str(var):
           _, var, _, value = str(var).split()
           match, date = var.split(",")

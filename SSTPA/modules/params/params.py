@@ -17,14 +17,14 @@ from modules.params.parser import ChampStats
 #############################
 
 START_TIME = time.time()
-FECHAINI = 23
-FECHAFIN = 30
+FECHAINI = 6
+FECHAFIN = 10
 if (len(sys.argv)) == 3:
   FECHAINI = int(sys.argv[1])
   FECHAFIN = int(sys.argv[2])
 THRESHOLD = 100
-FILTER = 1
-TARGET = 15
+FILTER = 0.25
+TARGET = 10
 BREAKS = 2
 FILENAME = "SSTPA/modules/params/Datos.xlsx"
 TIMELIMIT = (10000) * 60 * 60
@@ -43,18 +43,18 @@ stats = ChampStats(FILENAME, FECHAINI, FECHAFIN)
 I = list(stats.teams.keys())
 
 # N: Partidos
-N = list(range((FECHAINI - 1) * 8 + 1, FECHAFIN * 8 + 1))
+N = list(range((FECHAINI - 1) * 3 + 1, FECHAFIN * 3 + 1))
 
 # Si: S[equipo]
 # Patrones de localias asociados al equipo i
 full_homeaway_patterns = list(home_away_patterns(BREAKS)).copy()
-patterns = list(set([pat[FECHAINI - 16:FECHAFIN - 15] for pat in full_homeaway_patterns]))
+patterns = list(set([pat[FECHAINI - 6:FECHAFIN - 5] for pat in full_homeaway_patterns]))
 patterns = {i + 1: patterns[i] for i in range(len(patterns))}
 
 S_full = dict()
 for i in I:
   pat = check_homeaway_pattern(i, stats.team_home_away, full_homeaway_patterns, stats.teams, FECHAINI, BREAKS)
-  pat = list(set([p[FECHAINI - 16:FECHAFIN - 15] for p in pat]))
+  pat = list(set([p[FECHAINI - 6:FECHAFIN - 5] for p in pat]))
   S_full[i] = {f"{i}-{j + 1}": pat[j] for j in range(len(pat))}
 S = {i: list(S_full[i].keys()) for i in I}
 
