@@ -54,11 +54,48 @@ class ModelStats:
   @staticmethod
   def parse_gurobi_output(model_vars, matches, patterns):
     file_lines = dict()
+    with open("variables.csv", "w") as archivo:
+      archivo.write("VARIABLES\n")
     try:
       for var in model_vars:
-        if "p_m" in str(var):
-          if (str(var)[20:21] != "10") and ((str(var)[20] < str(var)[22]) or (str(var)[22] == "1")):
-            print(var)
+        with open("variables.csv", "a") as archivo:
+          #if "p_m" in str(var):
+          #  if (str(var)[20:21] != "10") and ((str(var)[20] <= str(var)[22]) or (str(var)[22] == "1")):
+          #    archivo.write(str(var) + "\n") #<gurobi.Var p_m[A,A,6,7] (value 21.0)>
+                                             #01234567890123456789012345678901234567890
+          if "v_m" in str(var):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "a_m" in str(var) and not("alfa" in str(var)) and not("beta" in str(var)):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "e_m" in str(var):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "v_p" in str(var):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "a_p" in str(var) and not("alfa" in str(var)) and not("beta" in str(var)):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "e_p" in str(var):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "x" in str(var):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "alfa_m" in str(var):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "beta_m" in str(var):
+            archivo.write(str(var) + "\n")
+          elif "alfa_p" in str(var):
+            if "value 1" in str(var):
+              archivo.write(str(var) + "\n")
+          elif "beta_p" in str(var):
+            archivo.write(str(var) + "\n")
+        #if "p_m" in str(var):
+        #  print(str(var))
         if "x" in str(var):
           _, var, _, value = str(var).split()
           match, date = var.split(",")

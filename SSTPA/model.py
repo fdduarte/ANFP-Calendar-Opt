@@ -6,13 +6,14 @@ sys.path.append(os.path.abspath(os.path.join('..', 'ANFP-Calendar-Opt', 'SSTPA')
 
 from modules.params.params import N, F, S, I, T, G, R, EL, EV, L, RP, PI, EB, V, H, M, TIMELIMIT, START_TIME, stats, S_full
 from modules.model_stats import ModelStats
+import openpyxl as opx
 
 m = Model("SSTPA MULTIPLES POSICIONES")
 
 
 m.setParam('TimeLimit', TIMELIMIT)
 m.setParam('MIPFocus', 1)
-m.setParam('MIPGap', 0.3)
+m.setParam('MIPGap', 0)
 
 
 start_model = time.time()
@@ -215,48 +216,48 @@ for i in I:
 
 
 
-''' 
+#''' 
 #10 y 11 estaban mal escritas.
 # R10
-m.addConstrs(((p_m[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n,theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta > 5 and theta <= l)
-           + quicksum(quicksum(3 * v_m[n,i,theta,fpython] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] == 1) 
-           + quicksum(quicksum(3 * a_m[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EV[j][n] == 1) 
-           + quicksum(quicksum(e_m[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] + EV[j][n] == 1)) 
-                        for j in I 
-                        for i in I 
-                        for f in F 
-                        for l in F), name="R10")
+#m.addConstrs(((p_m[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n,theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta > 5 and theta <= l)
+#           + quicksum(quicksum(3 * v_m[n,i,theta,fpython] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] == 1) 
+#           + quicksum(quicksum(3 * a_m[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EV[j][n] == 1) 
+#           + quicksum(quicksum(e_m[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] + EV[j][n] == 1)) 
+#                        for j in I 
+#                        for i in I 
+#                        for f in F 
+#                        for l in F), name="R10")
 
 # R11
-m.addConstrs(((p_p[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n,theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta > 5 and theta <= l)
-           + quicksum(quicksum(3 * v_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] == 1) 
-           + quicksum(quicksum(3 * a_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EV[j][n] == 1) 
-           + quicksum(quicksum(e_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] + EV[j][n] == 1)) 
-                        for j in I 
-                        for i in I 
-                        for f in F 
-                        for l in F), name="R11")
+#m.addConstrs(((p_p[j,i,l,f] == PI[j] + quicksum(quicksum(R[i][n] * x[n,theta] for n in N if EL[i][n] + EV[i][n]  == 1) for theta in F if theta > 5 and theta <= l)
+#           + quicksum(quicksum(3 * v_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] == 1) 
+#           + quicksum(quicksum(3 * a_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EV[j][n] == 1) 
+#           + quicksum(quicksum(e_p[n,i,theta,f] for theta in F if theta > l and theta <= f) for n in N if EL[j][n] + EV[j][n] == 1)) 
+#                        for j in I 
+#                        for i in I 
+#                        for f in F 
+#                        for l in F), name="R11")
 
 #R12
-m.addConstrs((((M - M * alfa_m[i, j, l] >= p_m[j, i, l, F[-1]] - p_m[i, i, l, F[-1]])) for i in I
-                                                                          for j in I
-                                                                          for l in F), name="R12")
+#m.addConstrs((((M - M * alfa_m[i, j, l] >= p_m[j, i, l, F[-1]] - p_m[i, i, l, F[-1]])) for i in I
+#                                                                          for j in I
+#                                                                          for l in F), name="R12")
 
 # R13                                                                                        
-m.addConstrs((((M * (alfa_p[i, j, l]) >= p_p[i, i, l, F[-1]] - p_p[j, i, l, F[-1]])) for i in I
-                                                                           for j in I
-                                                                           for l in F), name="R13")
+#m.addConstrs((((M * (alfa_p[i, j, l]) >= p_p[i, i, l, F[-1]] - p_p[j, i, l, F[-1]])) for i in I
+#                                                                           for j in I
+#                                                                           for l in F), name="R13")
 
 #R14
-for i in I:
-  m.addConstrs(((beta_m[i,l]==len(I)-(quicksum(alfa_m[i,j,l] for j in I if i!=j))) for l in F),name="R14")
+#for i in I:
+#  m.addConstrs(((beta_m[i,l]==len(I)-(quicksum(alfa_m[i,j,l] for j in I if i!=j))) for l in F),name="R14")
 
 
 # R15
-for i in I:
-  m.addConstrs(((beta_p[i,l]==len(I)-(quicksum(alfa_p[i,j,l] for j in I if i!=j))) for l in F),name="R15")
+#for i in I:
+#  m.addConstrs(((beta_p[i,l]==len(I)-(quicksum(alfa_p[i,j,l] for j in I if i!=j))) for l in F),name="R15")
 
-'''
+#'''
 print(f"** RESTRICTIONS TIME: {time.time() - start_model}")
 ########################
 #*  FUNCION OBJETIVO  *#
@@ -277,5 +278,294 @@ print(f"** TOTAL TIME: {time.time() - START_TIME}")
 ModelStats.parse_gurobi_output(m.getVars(), stats.matches, S_full)
 ModelStats.check_valid_output()
 
-for i in I:
-  print(PI[i])
+
+
+wb = opx.Workbook()
+wb.save("salida.xlsx")
+def escribir_hoja(hoja,equipo, fechas, fecha_inicio, equipos, partidos_por_fecha):
+    hoja = wb[hoja]
+    hoja.title = equipo
+    fecha_i= fecha_inicio
+    for fecha in range(fechas):
+        row = 1+(fecha)*(len(equipos)+partidos_por_fecha+1)
+        column = 3
+        fecha_i = fecha_inicio
+        for fecha in range(fechas):
+            hoja.cell(row=row, column=column, value ="fecha"+ str(fecha_i))
+            column+=2
+            fecha_i +=1
+
+    for fecha in range(fechas): 
+        row = 1+(fecha)*(len(equipos)+partidos_por_fecha+1)
+        column = 1
+        hoja.cell(row=row, column=column, value ="Puntaje Conocido")
+        hoja.cell(row = row, column = 1+len(equipos)*2, value="Alfa")
+        hoja.cell(row = row, column = 3+len(equipos)*2, value="Beta")
+
+    for i in range(fechas):
+        row = (len(equipos)+partidos_por_fecha+1)*i + 2+partidos_por_fecha
+        column = 1
+        for j in range(fechas+1):
+            for equipo in equipos:
+                hoja.cell(row=row, column=column, value=equipo)
+                row+=1
+            column +=2
+            row = (len(equipos)+partidos_por_fecha+1)*i+2+partidos_por_fecha
+    for i in range(fechas):
+        row = 2 + i*(len(equipos)+partidos_por_fecha+1)
+        column = 3
+        fecha_i = fecha_inicio
+        for j in range(fechas):
+            for n in range(len(dicc_n_f[fecha_i])):
+              hoja.cell(row=n+row, column=column, value=stats.matches[dicc_n_f[fecha_i][n]]['home'] + "-" + stats.matches[dicc_n_f[fecha_i][n]]['away'])
+            column +=2
+            fecha_i+=1
+    stop = 0
+    for i in range(fechas):
+        row = 2 + i*(len(equipos)+partidos_por_fecha+1)
+        column = 4
+        fecha_i = fecha_inicio
+        for j in range(fechas):
+            for n in range(len(dicc_n_f[fecha_i])):
+              hoja.cell(row=n+row, column= column, value=stats.matches[dicc_n_f[fecha_i][n]]['winner'])
+            column +=2
+            fecha_i+=1
+            if j == stop:
+              stop += 1
+              break
+    for i in range(1, fechas):
+        row = 2 + (i - 1)*(len(equipos)+partidos_por_fecha+1)
+        column = 4 + 2 * i
+        fecha_i = fecha_inicio + i - 1
+        for j in range(i + 1, fechas + 1):
+            fecha_j = fecha_inicio + j - 1
+            for n in range(len(dicc_n_f[fecha_j])):
+              if "ME" in hoja.title:
+                if (dicc_n_f[fecha_j][n], hoja.title[2:], fecha_i, fecha_j) in v_m_list:
+                  hoja.cell(row=n+row, column= column, value='H')
+                elif (dicc_n_f[fecha_j][n], hoja.title[2:], fecha_i, fecha_j) in a_m_list:
+                  hoja.cell(row=n+row, column= column, value='A')
+                elif (dicc_n_f[fecha_j][n], hoja.title[2:], fecha_i, fecha_j) in e_m_list:
+                  hoja.cell(row=n+row, column= column, value='D')                  
+              else:
+                if (dicc_n_f[fecha_j][n], hoja.title[2:], fecha_i, fecha_j) in v_p_list:
+                  hoja.cell(row=n+row, column= column, value='H')
+                elif (dicc_n_f[fecha_j][n], hoja.title[2:], fecha_i, fecha_j) in a_p_list:
+                  hoja.cell(row=n+row, column= column, value='A')
+                elif (dicc_n_f[fecha_j][n], hoja.title[2:], fecha_i, fecha_j) in e_p_list:
+                  hoja.cell(row=n+row, column= column, value='D')
+            column +=2
+    for i in range(fechas):
+        row = (len(equipos)+partidos_por_fecha+1)*i + 2+partidos_por_fecha
+        column = 2
+        for j in range(fechas+1):
+            for equipo in equipos:
+                hoja.cell(row=row, column=column, value=PI[equipo])
+                row+=1
+            row = (len(equipos)+partidos_por_fecha+1)*i+2+partidos_por_fecha
+    stop=0
+    for i in range(fechas):
+        row = 2+partidos_por_fecha + i*(len(equipos)+partidos_por_fecha+1)
+        column = 4
+        fecha_i = fecha_inicio
+        for j in range(fechas):
+            c = 0
+            for equipo in equipos:
+              if "ME" in hoja.title:
+                hoja.cell(row=c + row, column=column, value=p_m_dic[(equipo, hoja.title[2:], fecha_inicio + j, fecha_inicio + j)])
+                c+=1
+              else:
+                hoja.cell(row=c + row, column=column, value=p_p_dic[(equipo, hoja.title[2:], fecha_inicio + j, fecha_inicio + j)])
+                c+=1
+            column +=2
+            fecha_i+=1
+            if j == stop:
+              stop += 1
+              break
+    for i in range(0, fechas):
+        row = (len(equipos)+partidos_por_fecha+1)*i + 2+partidos_por_fecha
+        column = 6 + 2 * i
+        fecha_i = fecha_inicio + i -1
+        for j in range(i + 1, fechas):
+            fecha_j = fecha_inicio + j -1
+            c = 0
+            for equipo in equipos:
+              if "ME" in hoja.title:
+                  hoja.cell(row=c+row, column= column, value=p_m_dic[(equipo, hoja.title[2:], fecha_inicio + i, fecha_inicio + j)])
+                  c+=1
+              else:
+                  hoja.cell(row=c+row, column= column, value=p_p_dic[(equipo, hoja.title[2:], fecha_inicio + i, fecha_inicio + j)])
+                  c+=1
+            column +=2
+    for i in range(fechas):
+        column = 13
+        for j in range(1, fechas + 1):
+            row = (len(equipos)+partidos_por_fecha+1)*(j - 1) + 2+partidos_por_fecha
+            c = 0
+            for equipo in equipos:
+              if "ME" in hoja.title:
+                #print(str((equipo, hoja.title[2:], fecha_inicio + j - 1)) + " ALFA_M = " + str(alfa_m_dic[(equipo, hoja.title[2:], fecha_inicio + j - 1)]))
+                #valor = str(alfa_m_dic[(equipo, hoja.title[2:], fecha_inicio + j - 1)])
+                hoja.cell(row=c+row, column=column, value=str(alfa_m_dic[(equipo, hoja.title[2:], fecha_inicio + j - 1)]))
+                c += 1
+    for i in range(fechas):
+        column = 13
+        for j in range(1, fechas + 1):
+            row = (len(equipos)+partidos_por_fecha+1)*(j - 1) + 2+partidos_por_fecha
+            c = 0
+            for equipo in equipos:
+              if "PE" in hoja.title:
+                #print(str((equipo, hoja.title[2:], fecha_inicio + j - 1)) + " ALFA_P = " + str(alfa_p_dic[(equipo, hoja.title[2:], fecha_inicio + j - 1)]))
+                #valor = str(alfa_p_dic[(equipo, hoja.title[2:], fecha_inicio + j - 1)])
+                hoja.cell(row=c+row, column=column, value=str(alfa_p_dic[(equipo, hoja.title[2:], fecha_inicio + j - 1)]))
+                c+=1
+    for i in range(fechas):
+        row = (len(equipos)+partidos_por_fecha+1)*i + 2+partidos_por_fecha
+        column = (fechas+2)*2+1
+        for j in range(fechas+1):
+            for equipo in equipos:
+                if "ME" in hoja.title and equipo in hoja.title[2:]:
+                    hoja.cell(row=row, column=column, value=beta_m_dic[(equipo, fecha_inicio + i)])
+                    row+=1
+                elif "PE" in hoja.title and equipo in hoja.title[2:]: 
+                    hoja.cell(row=row, column=column, value=beta_p_dic[(equipo, fecha_inicio + i)])
+                    row+=1
+                else:
+                    hoja.cell(row=row, column=column, value="-")
+                    row+=1
+            row = (len(equipos)+partidos_por_fecha+1)*i+2+partidos_por_fecha
+    wb.save("salida.xlsx")
+
+
+dicc_n_f = {}
+v_m_list = []
+v_p_list = []
+
+a_m_list = []
+a_p_list = []
+
+e_m_list = []
+e_p_list = []
+
+p_m_dic = {}
+p_p_dic = {}
+
+alfa_m_dic = {}
+alfa_p_dic = {}
+
+beta_m_dic = {}
+beta_p_dic = {}
+
+for i in range(6, 11):
+  dicc_n_f[i] = list()
+for var in m.getVars():
+  if "value 1" in str(var) and "x" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    numeros = str(var)[i+1:f]
+    N,f = numeros.split(",")
+    dicc_n_f[int(f)].append(int(N))
+  elif "value 1" in str(var) and "v_m" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    numeros = str(var)[i+1:f]
+    n, i, l, f = numeros.split(",")
+    v_m_list.append((int(n), i, int(l), int(f)))
+  elif "value 1" in str(var) and "v_p" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    numeros = str(var)[i+1:f]
+    n, i, l, f = numeros.split(",")
+    v_p_list.append((int(n), i, int(l), int(f)))
+  elif "value 1" in str(var) and "a_m" in str(var) and not("alfa_m" in str(var)) and not("beta_m" in str(var)):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    numeros = str(var)[i+1:f]
+    n, i, l, f = numeros.split(",")
+    a_m_list.append((int(n), i, int(l), int(f)))
+  elif "value 1" in str(var) and "a_p" in str(var) and not("alfa_p" in str(var)) and not("beta_p" in str(var)):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    numeros = str(var)[i+1:f]
+    n, i, l, f = numeros.split(",")
+    a_p_list.append((int(n), i, int(l), int(f)))
+  elif "value 1" in str(var) and "e_m" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    numeros = str(var)[i+1:f]
+    n, i, l, f = numeros.split(",")
+    e_m_list.append((int(n), i, int(l), int(f)))
+  elif "value 1" in str(var) and "e_p" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    numeros = str(var)[i+1:f]
+    n, i, l, f = numeros.split(",")
+    e_p_list.append((int(n), i, int(l), int(f)))
+  elif "p_m" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    i_value = str(var).index("(") + 7
+    j_value = str(var).index(")") - 2
+    numeros = str(var)[i+1:f]
+    value = str(var)[i_value:j_value]
+    j, i, l, f = numeros.split(",")
+    p_m_dic[(j, i, int(l), int(f))] = value
+  elif "p_p" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    i_value = str(var).index("(") + 7
+    j_value = str(var).index(")") - 2
+    numeros = str(var)[i+1:f]
+    value = str(var)[i_value:j_value]
+    j, i, l, f = numeros.split(",")
+    p_p_dic[(j, i, int(l), int(f))] = value
+  elif "alfa_m" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    i_value = str(var).index("(") + 7
+    j_value = str(var).index(")") - 2
+    numeros = str(var)[i+1:f]
+    value = str(var)[i_value:j_value]
+    j, i, l = numeros.split(",")
+    alfa_m_dic[(j, i, int(l))] = value
+  elif "alfa_p" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    i_value = str(var).index("(") + 7
+    j_value = str(var).index(")") - 2
+    numeros = str(var)[i+1:f]
+    value = str(var)[i_value:j_value]
+    j, i, l = numeros.split(",")
+    alfa_p_dic[(j, i, int(l))] = value
+  elif "beta_m" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    i_value = str(var).index("(") + 7
+    j_value = str(var).index(")") - 2
+    numeros = str(var)[i+1:f]
+    value = str(var)[i_value:j_value]
+    i, l = numeros.split(",")
+    beta_m_dic[(i, int(l))] = value
+  elif "beta_p" in str(var):
+    i = str(var).index("[")
+    f = str(var).index("]")
+    i_value = str(var).index("(") + 7
+    j_value = str(var).index(")") - 2
+    numeros = str(var)[i+1:f]
+    value = str(var)[i_value:j_value]
+    i, l = numeros.split(",")
+    beta_p_dic[(i, int(l))] = value
+
+hojas = []
+for equipo in stats.teams.keys():
+    mejor = "ME" + equipo
+    peor = "PE" + equipo
+    hojas.append(mejor)
+    hojas.append(peor)
+for hoja in hojas:
+    wb.create_sheet(hoja)
+    escribir_hoja(hoja,hoja, 5, 6, stats.teams.keys(), 3)
+
+
+#for i in beta_m_dic:
+#  print(str(i) + " MEJOR LUGAR ES " + str(beta_m_dic[i]) + " PEOR LUGAR ES " + str(beta_p_dic[i]))
